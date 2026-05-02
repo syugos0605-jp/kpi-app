@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KPI ミーティングシート</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #0f172a;
+    --border: #334155; --text: #e2e8f0; --muted: #64748b;
+    --blue: #3b82f6; --green: #10b981; --yellow: #f59e0b;
+    --red: #ef4444; --purple: #6366f1; --pink: #ec4899;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, #1e3a5f, var(--bg)); border-bottom: 1px solid #1e3a5f; padding: 20px 24px 0; position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 900px; margin: 0 auto; }
+  .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .logo-text .title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; color: #f1f5f9; letter-spacing: 1px; }
+  .logo-text .sub { font-size: 11px; color: var(--muted); }
+  .rec-count { margin-left: auto; font-size: 12px; color: var(--muted); background: var(--surface); padding: 4px 10px; border-radius: 20px; flex-shrink: 0; }
+  .tabs { display: flex; }
+  .tab { padding: 10px 24px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; background: transparent; color: var(--muted); border-bottom: 2px solid transparent; transition: all .2s; font-family: inherit; }
+  .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+  /* Main */
+  .main { max-width: 900px; margin: 0 auto; padding: 24px 16px 80px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* Section */
+  .section { background: var(--surface); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+  .section-header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .section-title { font-weight: 700; font-size: 14px; color: #f1f5f9; }
+  .section-line { height: 2px; flex: 1; border-radius: 2px; }
+  .section-body { padding: 18px; }
+
+  /* Form elements */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+  input, textarea, select {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 12px; color: var(--text); font-size: 13px; font-family: inherit;
+    outline: none; width: 100%; transition: border-color .2s;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--blue); }
+  textarea { resize: vertical; }
+
+  /* KPI Table */
+  .kpi-table { width: 100%; border-collapse: collapse; font-size: 13px; overflow-x: auto; display: block; }
+  .kpi-table th { padding: 8px 10px; background: var(--surface2); color: var(--muted); font-weight: 600; text-align: center; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .kpi-table td { padding: 4px; border-bottom: 1px solid var(--bg); }
+  .kpi-table td.label { padding: 8px 10px; font-weight: 600; white-space: nowrap; }
+  .kpi-table td.calc { padding: 8px 10px; text-align: center; font-weight: 700; }
+  .kpi-table input { text-align: center; min-width: 60px; }
+
+  /* Action cards */
+  .action-card { background: var(--surface2); border-radius: 10px; padding: 14px; margin-bottom: 10px; border: 1px solid var(--border); }
+  .action-card-num { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .pill-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+  .pill { padding: 5px 12px; border-radius: 20px; border: 1px solid; cursor: pointer; font-size: 12px; font-weight: 600; background: transparent; transition: all .15s; font-family: inherit; }
+
+  /* Submit */
+  .submit-btn { padding: 16px; border-radius: 14px; border: none; cursor: pointer; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; font-family: inherit; box-shadow: 0 4px 20px rgba(59,130,246,0.4); transition: all .3s; width: 100%; }
+  .submit-btn:disabled { opacity: .6; cursor: not-allowed; }
+  .submit-btn.success { background: #10b981; }
+
+  /* History */
+  .history-card { background: var(--surface); border-radius: 14px; padding: 18px; cursor: pointer; border: 1px solid var(--border); transition: border-color .2s; margin-bottom: 12px; }
+  .history-card:hover { border-color: var(--blue); }
+  .badge { padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .kpi-mini { text-align: center; }
+  .kpi-mini .val { font-size: 18px; font-weight: 700; }
+  .kpi-mini .lbl { font-size: 10px; color: var(--muted); }
+  .situation-preview { margin-top: 10px; font-size: 12px; color: #94a3b8; line-height: 1.6; border-top: 1px solid var(--border); padding-top: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Detail */
+  .back-btn { background: var(--surface); border: 1px solid var(--border); color: #94a3b8; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; margin-bottom: 16px; }
+  .detail-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .detail-table th { padding: 8px 10px; background: var(--surface2); color: var(--muted); text-align: center; border-bottom: 1px solid var(--border); }
+  .detail-table td { padding: 8px 10px; border-bottom: 1px solid var(--bg); text-align: center; }
+  .detail-table td.lbl { text-align: left; font-weight: 600; }
+  .detail-action { background: var(--surface2); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+
+  /* Loading / Empty */
+  .center { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .center .icon { font-size: 48px; margin-bottom: 12px; }
+  .center .msg { font-size: 16px; }
+  .center .sub { font-size: 13px; margin-top: 8px; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; z-index: 999; opacity: 0; transition: opacity .3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 600px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .header { padding: 14px 16px 0; }
+    .tab { padding: 10px 16px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="logo">📋</div>
+      <div class="logo-text">
+        <div class="title">KPI MEETING</div>
+        <div class="sub">週次ミーティングシート</div>
+      </div>
+      <div class="rec-count" id="recCount">読込中...</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('form')">📝 入力</button>
+      <button class="tab" onclick="showTab('history')">📊 履歴</button>
+    </div>
+  </div>
+</div>
+
+<div class="main" id="formTab">
+
+  <!-- 基本情報 -->
+  <div class="section">
+    <div class="section-header" style="background:linear-gradient(90deg,#3b82f618,transparent)">
+      <span>🏪</span><span class="section-title">基本情報</span>
+      <div class="section-line" style="background:linear-gradient(90deg,#3b82f666,transparent)"></div>
+    </div>
+    <div class="section-body">
+      <div class="grid2">
+        <div class="field"><label>記録日</label><input type="date" id="f_date" /></div>
+        <div class="field"><label>実施週</label><input type="text" id="f_week" placeholder="例: 第18週 (4/28〜5/2)" /></div>
+        <div class="field"><label>店舗名</label><input type="text" id="f_store" list="storeList" placeholder="○○店" /><datalist id="storeList"><option value="渋谷店"/><option value="新宿店"/><option value="池袋店"/><option value="銀座店"/></datalist></div>
+        <div class="field"><label>トレーナー名</label><input type="text" id="f_trainer" placeholder="○○トレーナー" /></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI数値 -->
+  <div class="section">
+    <div class="section-header" style="background:linear-gradient(90deg,#10b98118,transparent)">
+      <span>📈</span><span class="section-title">店舗状況 — 数値</span>
+      <div class="section-line" style="background:linear-gradient(90deg,#10b98166,transparent)"></div>
+    </div>
+    <div class="section-body" style="overflow-x:auto">
+      <table class="kpi-table">
+        <thead><tr><th>項目</th><th>先週実績</th><th>今週実績</th><th>差分</th><th>目標値</th><th>達成率</th></tr></thead>
+        <tbody id="kpiBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- コメント -->
+  <div class="section">
+    <div class="section-header" style="background:linear-gradient(90deg,#f59e0b18,transparent)">
+      <span>💬</span><span class="section-title">店舗状況コメント</span>
+      <div class="section-line" style="background:linear-gradient(90deg,#f59e0b66,transparent)"></div>
+    </div>
+    <div class="section-body">
+      <textarea id="f_situation" rows="4" placeholder="退会・休会の理由、アップ/ダウンセルの背景、その他気になる点など..."></textarea>
+    </div>
+  </div>
+
+  <!-- 先週アクション -->
+  <div class="section">
+    <div class="section-header" style="background:linear-gradient(90deg,#6366f118,transparent)">
+      <span>✅</span><span class="section-title">先週アクション結果</span>
+      <div class="section-line" style="background:linear-gradient(90deg,#6366f166,transparent)"></div>
+    </div>
+    <div class="section-body" id="lastActionsBody"></div>
+  </div>
+
+  <!-- 来週アクション -->
+  <div class="section">
+    <div class="section-header" style="background:linear-gradient(90deg,#ec489918,transparent)">
+      <span>🎯</span><span class="section-title">来週アクション目標</span>
+      <div class="section-line" style="background:linear-gradient(90deg,#ec489966,transparent)"></div>
+    </div>
+    <div class="section-body" id="nextActionsBody"></div>
+  </div>
+
+  <!-- メモ -->
+  <div class="section">
+    <div class="section-header" style="background:linear-gradient(90deg,#94a3b818,transparent)">
+      <span>📝</span><span class="section-title">自由メモ・その他共有事項</span>
+      <div class="section-line" style="background:linear-gradient(90deg,#94a3b866,transparent)"></div>
+    </div>
+    <div class="section-body">
+      <textarea id="f_memo" rows="3" placeholder="悩み、相談、気づき、次回ミーティングで取り上げたいことなど"></textarea>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitForm()">💾 記録を保存する</button>
+</div>
+
+<!-- 履歴タブ -->
+<div class="main" id="historyTab" style="display:none">
+  <div id="historyContent"></div>
+</div>
+
+<!-- 詳細ビュー -->
+<div class="main" id="detailTab" style="display:none">
+  <div id="detailContent"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbxoZmYDU2sArUQ8zBR8JCxvTefMwG0XJm5JOL47gP2R15aR0CD8jQpySuxidSvjeHFN/exec";
+
+const KPI_ROWS = [
+  { key:"inquiry", label:"新規問合せ数", color:"#16a34a" },
+  { key:"join",    label:"新規入会数",   color:"#16a34a" },
+  { key:"quit",    label:"退会者数",     color:"#dc2626" },
+  { key:"pause",   label:"休会者数",     color:"#dc2626" },
+  { key:"upsell",  label:"アップセル数", color:"#ca8a04" },
+  { key:"downsell",label:"ダウンセル数", color:"#ca8a04" },
+  { key:"total",   label:"在籍会員数",   color:"#2563eb" },
+];
+const ACTION_STATUS = [
+  {v:"done",     l:"✅ 完了",    c:"#10b981"},
+  {v:"partial",  l:"⚠️ 一部実施",c:"#f59e0b"},
+  {v:"not_done", l:"❌ 未実施",  c:"#ef4444"},
+  {v:"carry_over",l:"⏩ 繰越",   c:"#6366f1"},
+];
+const PRIORITY = [
+  {v:"high",l:"🔴 高",c:"#ef4444"},
+  {v:"mid", l:"🟡 中",c:"#f59e0b"},
+  {v:"low", l:"🟢 低",c:"#10b981"},
+];
+
+let records = [];
+let kpiVals = {};
+let lastActions = [{content:"",status:"",review:""},{content:"",status:"",review:""},{content:"",status:"",review:""}];
+let nextActions = [{content:"",person:"",deadline:"",priority:""},{content:"",person:"",deadline:"",priority:""},{content:"",person:"",deadline:"",priority:""},{content:"",person:"",deadline:"",priority:""}];
+
+// Init
+document.getElementById("f_date").value = new Date().toISOString().slice(0,10);
+KPI_ROWS.forEach(r => { kpiVals[r.key] = {last:"",this:"",target:""}; });
+buildKpiTable();
+buildLastActions();
+buildNextActions();
+loadRecords();
+
+function buildKpiTable() {
+  const tbody = document.getElementById("kpiBody");
+  tbody.innerHTML = "";
+  KPI_ROWS.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="label" style="color:${row.color}">${row.label}</td>
+      <td><input type="number" id="kpi_${row.key}_last" oninput="updateCalc('${row.key}')" /></td>
+      <td><input type="number" id="kpi_${row.key}_this" oninput="updateCalc('${row.key}')" /></td>
+      <td class="calc" id="kpi_${row.key}_diff">—</td>
+      <td><input type="number" id="kpi_${row.key}_target" oninput="updateCalc('${row.key}')" /></td>
+      <td class="calc" id="kpi_${row.key}_rate">—</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateCalc(key) {
+  const last = parseFloat(document.getElementById(`kpi_${key}_last`)?.value);
+  const th   = parseFloat(document.getElementById(`kpi_${key}_this`)?.value);
+  const tgt  = parseFloat(document.getElementById(`kpi_${key}_target`)?.value);
+  const diffEl = document.getElementById(`kpi_${key}_diff`);
+  const rateEl = document.getElementById(`kpi_${key}_rate`);
+  if (!isNaN(last) && !isNaN(th)) {
+    const d = th - last;
+    diffEl.textContent = (d >= 0 ? "+" : "") + d;
+    diffEl.style.color = d >= 0 ? "#10b981" : "#ef4444";
+  } else { diffEl.textContent = "—"; diffEl.style.color = "#475569"; }
+  if (!isNaN(th) && !isNaN(tgt) && tgt !== 0) {
+    const r = (th / tgt * 100).toFixed(1);
+    rateEl.textContent = r + "%";
+    rateEl.style.color = r >= 100 ? "#10b981" : r >= 70 ? "#f59e0b" : "#ef4444";
+  } else { rateEl.textContent = "—"; rateEl.style.color = "#475569"; }
+}
+
+function buildLastActions() {
+  const body = document.getElementById("lastActionsBody");
+  body.innerHTML = "";
+  lastActions.forEach((a, i) => {
+    const div = document.createElement("div");
+    div.className = "action-card";
+    div.innerHTML = `
+      <div class="action-card-num">アクション ${i+1}</div>
+      <textarea rows="2" placeholder="先週決めたアクション内容" oninput="lastActions[${i}].content=this.value">${a.content}</textarea>
+      <div class="pill-group" id="lastStatus_${i}"></div>
+      <textarea rows="2" placeholder="結果・振り返り" style="font-size:12px" oninput="lastActions[${i}].review=this.value">${a.review}</textarea>
+    `;
+    body.appendChild(div);
+    renderPills(`lastStatus_${i}`, ACTION_STATUS, a.status, v => { lastActions[i].status = v; renderPills(`lastStatus_${i}`, ACTION_STATUS, v, null, true); });
+  });
+}
+
+function buildNextActions() {
+  const body = document.getElementById("nextActionsBody");
+  body.innerHTML = "";
+  nextActions.forEach((a, i) => {
+    const div = document.createElement("div");
+    div.className = "action-card";
+    div.innerHTML = `
+      <div class="action-card-num">アクション ${i+1}</div>
+      <textarea rows="2" placeholder="具体的なアクション内容" oninput="nextActions[${i}].content=this.value">${a.content}</textarea>
+      <div class="grid2" style="margin:8px 0">
+        <div class="field"><label>担当者</label><input type="text" placeholder="○○トレーナー" oninput="nextActions[${i}].person=this.value" value="${a.person}" /></div>
+        <div class="field"><label>期限</label><input type="date" oninput="nextActions[${i}].deadline=this.value" value="${a.deadline}" /></div>
+      </div>
+      <div class="pill-group" id="nextPri_${i}"></div>
+    `;
+    body.appendChild(div);
+    renderPills(`nextPri_${i}`, PRIORITY, a.priority, v => { nextActions[i].priority = v; renderPills(`nextPri_${i}`, PRIORITY, v, null, true); });
+  });
+}
+
+function renderPills(containerId, options, selected, onClick, rerender) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = "";
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "pill";
+    btn.textContent = opt.l;
+    const isActive = selected === opt.v;
+    btn.style.borderColor = isActive ? opt.c : "#334155";
+    btn.style.background = isActive ? opt.c + "22" : "transparent";
+    btn.style.color = isActive ? opt.c : "#64748b";
+    if (onClick && !rerender) {
+      btn.onclick = () => onClick(opt.v);
+    } else if (rerender) {
+      btn.onclick = () => {
+        const newVal = opt.v;
+        if (containerId.startsWith("lastStatus_")) {
+          const idx = parseInt(containerId.replace("lastStatus_",""));
+          lastActions[idx].status = newVal;
+          renderPills(containerId, options, newVal, null, true);
+        } else {
+          const idx = parseInt(containerId.replace("nextPri_",""));
+          nextActions[idx].priority = newVal;
+          renderPills(containerId, options, newVal, null, true);
+        }
+      };
+    }
+    container.appendChild(btn);
+  });
+}
+
+async function submitForm() {
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true; btn.textContent = "保存中...";
+  const data = {
+    date: document.getElementById("f_date").value,
+    week: document.getElementById("f_week").value,
+    store: document.getElementById("f_store").value,
+    trainer: document.getElementById("f_trainer").value,
+    kpi: {},
+    situation: document.getElementById("f_situation").value,
+    lastActions, nextActions,
+    memo: document.getElementById("f_memo").value,
+  };
+  KPI_ROWS.forEach(r => {
+    data.kpi[r.key] = {
+      last: document.getElementById(`kpi_${r.key}_last`)?.value || "",
+      this: document.getElementById(`kpi_${r.key}_this`)?.value || "",
+      target: document.getElementById(`kpi_${r.key}_target`)?.value || "",
+    };
+  });
+  try {
+    await fetch(API, { method:"POST", body: JSON.stringify(data) });
+    btn.classList.add("success"); btn.textContent = "✅ 保存しました！";
+    showToast("✅ Googleスプレッドシートに保存しました！");
+    await loadRecords();
+    setTimeout(() => { btn.disabled=false; btn.classList.remove("success"); btn.textContent="💾 記録を保存する"; showTab("history"); }, 1500);
+  } catch(e) {
+    btn.disabled=false; btn.textContent="💾 記録を保存する";
+    showToast("❌ 保存に失敗しました。ネット接続を確認してください。");
+  }
+}
+
+async function loadRecords() {
+  try {
+    const res = await fetch(API);
+    const json = await res.json();
+    records = json.records || [];
+    document.getElementById("recCount").textContent = records.length + "件の記録";
+    renderHistory();
+  } catch(e) {
+    document.getElementById("recCount").textContent = "読込失敗";
+  }
+}
+
+function renderHistory() {
+  const container = document.getElementById("historyContent");
+  if (records.length === 0) {
+    container.innerHTML = `<div class="center"><div class="icon">📭</div><div class="msg">まだ記録がありません</div><div class="sub">入力タブから最初の記録を追加してください</div></div>`;
+    return;
+  }
+  container.innerHTML = records.map((rec, i) => {
+    const store = rec["店舗名"] || "店舗未設定";
+    const trainer = rec["トレーナー名"] || "トレーナー未設定";
+    const date = rec["記録日"] || "";
+    const week = rec["実施週"] || "";
+    const join = rec["新規入会(今週)"] || "—";
+    const quit = rec["退会者(今週)"] || "—";
+    const total = rec["在籍会員(今週)"] || "—";
+    const sit = rec["店舗状況コメント"] || "";
+    return `
+      <div class="history-card" onclick="showDetail(${i})">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div>
+            <div style="display:flex;gap:8px;margin-bottom:6px">
+              <span class="badge" style="background:#3b82f622;color:#3b82f6">${store}</span>
+              <span class="badge" style="background:#6366f122;color:#818cf8">${trainer}</span>
+            </div>
+            <div style="font-size:13px;color:var(--muted)">${date}${week ? " — " + week : ""}</div>
+          </div>
+          <div style="display:flex;gap:16px;flex-shrink:0">
+            <div class="kpi-mini"><div class="val" style="color:#10b981">${join}</div><div class="lbl">入会</div></div>
+            <div class="kpi-mini"><div class="val" style="color:#ef4444">${quit}</div><div class="lbl">退会</div></div>
+            <div class="kpi-mini"><div class="val" style="color:#3b82f6">${total}</div><div class="lbl">在籍</div></div>
+          </div>
+        </div>
+        ${sit ? `<div class="situation-preview">${sit}</div>` : ""}
+      </div>
+    `;
+  }).join("");
+}
+
+function showDetail(i) {
+  const rec = records[i];
+  const store = rec["店舗名"] || ""; const trainer = rec["トレーナー名"] || "";
+  const date = rec["記録日"] || ""; const week = rec["実施週"] || "";
+
+  let kpiRows = KPI_ROWS.map(r => {
+    const last = rec[r.label.replace("数","")+"(先週)"] || rec[`${r.label.replace("数","")}(先週)`] || "—";
+    // Map label to sheet column names
+    const colMap = {
+      "新規問合せ数": "新規問合せ", "新規入会数": "新規入会", "退会者数": "退会者",
+      "休会者数": "休会者", "アップセル数": "アップセル", "ダウンセル数": "ダウンセル", "在籍会員数": "在籍会員"
+    };
+    const base = colMap[r.label];
+    const lv = rec[`${base}(先週)`] ?? "—"; const tv = rec[`${base}(今週)`] ?? "—"; const tg = rec[`${base}(目標)`] ?? "—";
+    const d = (!isNaN(parseFloat(lv)) && !isNaN(parseFloat(tv))) ? parseFloat(tv)-parseFloat(lv) : null;
+    const rt = (!isNaN(parseFloat(tv)) && !isNaN(parseFloat(tg)) && parseFloat(tg)!==0) ? (parseFloat(tv)/parseFloat(tg)*100).toFixed(1) : null;
+    const dColor = d===null?"#475569":d>=0?"#10b981":"#ef4444";
+    const rColor = rt===null?"#475569":rt>=100?"#10b981":rt>=70?"#f59e0b":"#ef4444";
+    return `<tr><td class="lbl" style="color:${r.color}">${r.label}</td><td style="color:#94a3b8">${lv}</td><td style="font-weight:700">${tv}</td><td style="font-weight:700;color:${dColor}">${d===null?"—":(d>=0?"+":"")+d}</td><td style="color:#64748b">${tg}</td><td style="font-weight:700;color:${rColor}">${rt===null?"—":rt+"%"}</td></tr>`;
+  }).join("");
+
+  const lastActHTML = [1,2,3].map(n => {
+    const content = rec[`先週アクション${n}内容`]; if (!content) return "";
+    const status = rec[`先週アクション${n}状況`];
+    const review = rec[`先週アクション${n}振返`];
+    const s = ACTION_STATUS.find(x=>x.v===status);
+    return `<div class="detail-action">${s?`<span class="badge" style="background:${s.c}22;color:${s.c}">${s.l}</span>`:""}
+      <div style="margin-top:6px;color:#cbd5e1;font-size:13px">${content}</div>
+      ${review?`<div style="margin-top:6px;font-size:12px;color:#94a3b8;border-top:1px solid #334155;padding-top:6px">${review}</div>`:""}
+    </div>`;
+  }).join("");
+
+  const nextActHTML = [1,2,3,4].map(n => {
+    const content = rec[`来週アクション${n}内容`]; if (!content) return "";
+    const person = rec[`来週アクション${n}担当`]; const deadline = rec[`来週アクション${n}期限`];
+    const priority = rec[`来週アクション${n}優先度`];
+    const p = PRIORITY.find(x=>x.v===priority);
+    return `<div class="detail-action">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap">
+        ${p?`<span class="badge" style="background:${p.c}22;color:${p.c}">${p.l}</span>`:""}
+        ${person?`<span style="font-size:12px;color:#94a3b8">👤 ${person}</span>`:""}
+        ${deadline?`<span style="font-size:12px;color:#94a3b8">📅 ${deadline}</span>`:""}
+      </div>
+      <div style="font-size:13px;color:#cbd5e1">${content}</div>
+    </div>`;
+  }).join("");
+
+  const sit = rec["店舗状況コメント"]; const memo = rec["メモ"];
+
+  document.getElementById("detailContent").innerHTML = `
+    <button class="back-btn" onclick="showTab('history')">← 一覧に戻る</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="display:flex;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span class="badge" style="background:#3b82f622;color:#3b82f6;font-size:13px">${store}</span>
+          <span class="badge" style="background:#6366f122;color:#818cf8;font-size:13px">${trainer}</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted)">${date}${week?" — "+week:""}</div>
+      </div>
+    </div>
+    <div class="section" style="margin-bottom:16px">
+      <div class="section-header" style="background:linear-gradient(90deg,#10b98118,transparent)"><span>📈</span><span class="section-title">店舗状況 — 数値</span></div>
+      <div class="section-body" style="overflow-x:auto">
+        <table class="detail-table"><thead><tr><th>項目</th><th>先週</th><th>今週</th><th>差分</th><th>目標</th><th>達成率</th></tr></thead><tbody>${kpiRows}</tbody></table>
+      </div>
+    </div>
+    ${sit?`<div class="section" style="margin-bottom:16px"><div class="section-header" style="background:linear-gradient(90deg,#f59e0b18,transparent)"><span>💬</span><span class="section-title">店舗状況コメント</span></div><div class="section-body"><p style="line-height:1.8;color:#cbd5e1;white-space:pre-wrap">${sit}</p></div></div>`:""}
+    ${lastActHTML?`<div class="section" style="margin-bottom:16px"><div class="section-header" style="background:linear-gradient(90deg,#6366f118,transparent)"><span>✅</span><span class="section-title">先週アクション結果</span></div><div class="section-body">${lastActHTML}</div></div>`:""}
+    ${nextActHTML?`<div class="section" style="margin-bottom:16px"><div class="section-header" style="background:linear-gradient(90deg,#ec489918,transparent)"><span>🎯</span><span class="section-title">来週アクション目標</span></div><div class="section-body">${nextActHTML}</div></div>`:""}
+    ${memo?`<div class="section"><div class="section-header"><span>📝</span><span class="section-title">メモ</span></div><div class="section-body"><p style="line-height:1.8;color:#94a3b8;white-space:pre-wrap">${memo}</p></div></div>`:""}
+  `;
+  document.getElementById("formTab").style.display = "none";
+  document.getElementById("historyTab").style.display = "none";
+  document.getElementById("detailTab").style.display = "";
+}
+
+function showTab(t) {
+  document.getElementById("formTab").style.display = t==="form" ? "" : "none";
+  document.getElementById("historyTab").style.display = t==="history" ? "" : "none";
+  document.getElementById("detailTab").style.display = "none";
+  document.querySelectorAll(".tab").forEach((el,i) => el.classList.toggle("active", (i===0&&t==="form")||(i===1&&t==="history")));
+  if (t==="history") loadRecords();
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+</script>
+</body>
+</html>
